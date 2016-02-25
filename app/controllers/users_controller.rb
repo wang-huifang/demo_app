@@ -1,13 +1,13 @@
 class UsersController < ApplicationController
   before_action :signed_in_user, only: [:edit, :update]
   before_action :correct_user, only: [:edit, :update]
-  before_action :admin_user, only: :destory
+  before_action :admin_user, only: :destroy
 
   def new
     @user = User.new
   end
 
-  def create 
+  def create
     @user = User.new(user_params)
     if @user.save
       sign_in @user
@@ -20,6 +20,7 @@ class UsersController < ApplicationController
 
   def show
     @user = User.find(params[:id])
+    @microposts = @user.microposts.paginate(page: params[:page])
   end
 
   def edit
@@ -40,9 +41,9 @@ class UsersController < ApplicationController
     @users = User.paginate(page: params[:page])
   end
 
-  def destory
-    User.find(params[:id]).destory
-    flash[:success] = "User destoryed."
+  def destroy
+    User.find(params[:id]).destroy
+    flash[:success] = "User destroyed."
     redirect_to users_url
   end
 
@@ -53,12 +54,6 @@ class UsersController < ApplicationController
   end
 
   # Before filters
-  def signed_in_user
-    unless signed_in?
-      store_location
-      redirect_to signin_url, notice: "Please sign in." unless signed_in?
-    end
-  end
 
   def correct_user
     @user = User.find(params[:id])
